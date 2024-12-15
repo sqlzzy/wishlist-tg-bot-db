@@ -1,0 +1,33 @@
+{
+	"name": "wishlist-tg-bot-db",
+	"version": "1.0.0",
+	"description": "Wishlist Telegram Bot on NodeJS with sqlite3 database",
+	"main": "index.js",
+	"type": "module",
+	"scripts": {
+		"start": "node index.js",
+		"dev": "nodemon --ext js index.js"
+	},
+	"author": "Sergey Osipov (sqlzzy)",
+	"license": "ISC",
+	"dependencies": {
+		"node-telegram-bot-api": "^0.63.0",
+		"sqlite3": "^5.1.7"
+	},
+	"devDependencies": {
+		"nodemon": "^3.0.1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/sqlzzy/wishlist-tg-bot-db.git"
+	},
+	"keywords": [
+		"sqlite3",
+		"bot",
+		"nodejs"
+	],
+	"bugs": {
+		"url": "https://github.com/sqlzzy/wishlist-tg-bot-db/issues"
+	},
+	"homepage": "https://github.com/sqlzzy/wishlist-tg-bot-db#readme"
+}
