@@ -14,10 +14,6 @@ export default async (bot) => {
 
 				await sendPage(bot, chatId, messageId, currentPage);
 			} else if (REGEXP.prev_page.test(data)) {
-				if (currentPage !== 1) {
-					bot.deleteMessage(chatId, messageId);
-				}
-
 				currentPage -= 1;
 
 				await sendPage(bot, chatId, messageId, currentPage);

@@ -20,7 +20,7 @@ bot.onText(/\/start/, (msg) => {
 			`Привет, ${usernameCurrentUser}!\nВыбери команду для начала работы со списом желаний:`,
 			{
 				reply_markup: {
-					keyboard: mainKeyboard,
+					inline_keyboard: mainKeyboard,
 				},
 			},
 		);

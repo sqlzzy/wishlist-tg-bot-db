@@ -1,5 +1,5 @@
 import KEYBOARDS from "../keyboards/listKeyboards.js";
-import { MESSAGE_DISPLAY_BUTTONS_LIST } from "../commons/constants.js";
+import { MESSAGE_DISPLAY_BUTTONS_LIST, MESSAGES_STATUS_WISH } from "../commons/constants.js";
 
 let list = [];
 let typeWishes;
@@ -23,35 +23,58 @@ export default async (bot, chatId, messageId, currentPage, items, type) => {
 		const totalPages = Math.ceil(list.length / itemsPerPage);
 
 		let message = "";
+		let sharePageList = "";
+		let shareAllList = "";
+		let divider = "\n\n-----";
+		let shortTypeWishes = typeWishes[0];
 
 		for (let i = 0; i < pageItems.length; i++) {
 			let icon = typeWishes === "granted" ? "✅" : "⭐";
+			let status = typeWishes === "granted" ? MESSAGES_STATUS_WISH.granted : MESSAGES_STATUS_WISH.unrelized;
 
-			message += `${icon} /p\\_${currentPage}\\_w\\_${pageItems[i].id} *${pageItems[i].title}* \n\n`;
+			message += `${icon} /p\\_${currentPage}\\_${shortTypeWishes}\\_w\\_${pageItems[i].id} *${pageItems[i].title}* \n\n`;
+
+			if (pageItems[i].link) {
+				sharePageList += `\n\nЖелание № ${i + 1}. \n\nСтатус: ${status}\nЗаголовок: ${
+					pageItems[i].title
+				}\nСсылка: ${pageItems[i].link}`;
+			} else {
+				sharePageList += `\n\nЖелание № ${i + 1}. \n\nСтатус: ${status}\nЗаголовок: ${pageItems[i].title}`;
+			}
+
+			if (i + 1 !== pageItems.length) {
+				sharePageList += divider;
+			}
+		}
+
+		for (let i = 0; i < list.length; i++) {
+			let status = typeWishes === "granted" ? MESSAGES_STATUS_WISH.granted : MESSAGES_STATUS_WISH.unrelized;
+
+			if (list[i].link) {
+				shareAllList += `\n\nЖелание № ${i + 1}. \n\nСтатус: ${status}\nЗаголовок: ${list[i].title}\nСсылка: ${
+					list[i].link
+				}`;
+			} else {
+				shareAllList += `\n\nЖелание № ${i + 1}. \n\nСтатус: ${status}\nЗаголовок: ${list[i].title}`;
+			}
+
+			if (i + 1 !== list.length) {
+				shareAllList += divider;
+			}
 		}
 
 		const keyboard =
 			currentPage === 1
-				? KEYBOARDS.keyboardForStartList(currentPage)
+				? KEYBOARDS.keyboardForStartList(currentPage, sharePageList, shareAllList)
 				: currentPage === totalPages
-				? KEYBOARDS.keyboardForLastList(currentPage)
+				? KEYBOARDS.keyboardForLastList(currentPage, sharePageList, shareAllList)
 				: currentPage > 1 && currentPage < totalPages
-				? KEYBOARDS.keyboardForMiddleList(currentPage)
+				? KEYBOARDS.keyboardForMiddleList(currentPage, sharePageList, shareAllList)
 				: [];
 
 		message += `Всего желаний: *${list.length}* \n`;
 
-		if (list.length > 10 && currentPage === 1) {
-			message += `Страница ${currentPage} из ${totalPages}\n\n`;
-
-			await bot.sendMessage(chatId, message, {
-				disable_web_page_preview: true,
-				parse_mode: "Markdown",
-				reply_markup: {
-					inline_keyboard: keyboard,
-				},
-			});
-		} else if (list.length > 10 && currentPage !== 1) {
+		if (list.length > 10) {
 			message += `Страница ${currentPage} из ${totalPages}\n\n`;
 
 			await bot.editMessageText(message, {
@@ -59,6 +82,7 @@ export default async (bot, chatId, messageId, currentPage, items, type) => {
 				message_id: messageId,
 				reply_markup: {
 					inline_keyboard: keyboard,
+					resize_keyboard: true,
 				},
 				parse_mode: "Markdown",
 				disable_web_page_preview: true,
@@ -66,9 +90,15 @@ export default async (bot, chatId, messageId, currentPage, items, type) => {
 		} else {
 			message += MESSAGE_DISPLAY_BUTTONS_LIST;
 
-			await bot.sendMessage(chatId, message, {
-				disable_web_page_preview: true,
+			await bot.editMessageText(message, {
+				chat_id: chatId,
+				message_id: messageId,
 				parse_mode: "Markdown",
+				disable_web_page_preview: true,
+				reply_markup: {
+					inline_keyboard: KEYBOARDS.keyboardForListLessTenItems(shareAllList),
+					resize_keyboard: true,
+				},
 			});
 		}
 	} catch (error) {
